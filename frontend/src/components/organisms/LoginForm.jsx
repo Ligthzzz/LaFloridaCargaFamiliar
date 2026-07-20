@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { extraerMensajesError } from '../../utils/apiError'
 import { FormField } from '../molecules/FormField'
 import { Input } from '../atoms/Input'
 import { Button } from '../atoms/Button'
@@ -21,8 +22,16 @@ export function LoginForm() {
     try {
       const usuario = await login(email, password)
       navigate(usuario.rol === 'admin' ? '/admin' : '/', { replace: true })
-    } catch {
-      setError('Email o contraseña incorrectos')
+    } catch (err) {
+      if (err.response?.status === 401) {
+        setError('Email o contraseña incorrectos')
+      } else if (err.response) {
+        setError(extraerMensajesError(err, 'No se pudo iniciar sesión')[0])
+      } else {
+        setError(
+          'No se pudo conectar con el servidor. Intenta de nuevo en unos minutos.',
+        )
+      }
     } finally {
       setEnviando(false)
     }
