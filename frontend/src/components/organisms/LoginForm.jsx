@@ -23,8 +23,19 @@ export function LoginForm() {
       const usuario = await login(email, password)
       navigate(usuario.rol === 'admin' ? '/admin' : '/', { replace: true })
     } catch (err) {
-      if (err.response?.status === 401) {
-        setError('Email o contraseña incorrectos')
+      const status = err.response?.status
+      const restantes = err.response?.headers?.['x-ratelimit-remaining']
+
+      if (status === 429) {
+        setError(
+          'Demasiados intentos fallidos. Espera unos minutos antes de volver a intentar.',
+        )
+      } else if (status === 401) {
+        setError(
+          restantes !== undefined
+            ? `Email o contraseña incorrectos. Te quedan ${restantes} intentos antes del bloqueo temporal.`
+            : 'Email o contraseña incorrectos',
+        )
       } else if (err.response) {
         setError(extraerMensajesError(err, 'No se pudo iniciar sesión')[0])
       } else {

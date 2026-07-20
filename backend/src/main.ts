@@ -12,6 +12,11 @@ async function bootstrap(): Promise<void> {
   app.use(helmet());
   app.enableCors({
     origin: process.env.FRONTEND_ORIGIN,
+    exposedHeaders: [
+      'X-RateLimit-Limit',
+      'X-RateLimit-Remaining',
+      'X-RateLimit-Reset',
+    ],
   });
   app.useGlobalPipes(
     new ValidationPipe({
