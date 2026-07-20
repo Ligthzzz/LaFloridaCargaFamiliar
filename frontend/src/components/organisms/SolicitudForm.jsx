@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { crearSolicitud } from '../../api/solicitudes'
+import { crearSolicitud, editarSolicitud } from '../../api/solicitudes'
 import { formatearRut, formatearRutMientrasEscribe, validarRut } from '../../utils/rut'
 import { extraerMensajesError } from '../../utils/apiError'
 import { FormField } from '../molecules/FormField'
@@ -30,19 +30,35 @@ const ARCHIVOS_INICIALES = {
   archivoEstudios: null,
 }
 
-export function SolicitudForm() {
+export function SolicitudForm({ solicitudExistente }) {
   const { usuario } = useAuth()
   const navigate = useNavigate()
+  const editando = Boolean(solicitudExistente)
 
-  const [form, setForm] = useState({
-    tipoCarga: 'HIJO',
-    accion: 'ALTA',
-    nombreCarga: '',
-    rutCarga: '',
-    fechaNacimientoCarga: '',
-    parentesco: '',
-    observacionesFuncionario: '',
-  })
+  const [form, setForm] = useState(
+    solicitudExistente
+      ? {
+          tipoCarga: solicitudExistente.tipoCarga,
+          accion: solicitudExistente.accion,
+          nombreCarga: solicitudExistente.nombreCarga,
+          rutCarga: solicitudExistente.rutCarga
+            ? formatearRut(solicitudExistente.rutCarga)
+            : '',
+          fechaNacimientoCarga: solicitudExistente.fechaNacimientoCarga,
+          parentesco: solicitudExistente.parentesco ?? '',
+          observacionesFuncionario:
+            solicitudExistente.observacionesFuncionario ?? '',
+        }
+      : {
+          tipoCarga: 'HIJO',
+          accion: 'ALTA',
+          nombreCarga: '',
+          rutCarga: '',
+          fechaNacimientoCarga: '',
+          parentesco: '',
+          observacionesFuncionario: '',
+        },
+  )
   const [archivos, setArchivos] = useState(ARCHIVOS_INICIALES)
   const [errores, setErrores] = useState({})
   const [enviando, setEnviando] = useState(false)
@@ -93,7 +109,9 @@ export function SolicitudForm() {
 
     setEnviando(true)
     try {
-      const solicitud = await crearSolicitud(form, archivos)
+      const solicitud = editando
+        ? await editarSolicitud(solicitudExistente.id, form, archivos)
+        : await crearSolicitud(form, archivos)
       navigate(`/solicitudes/${solicitud.id}`)
     } catch (error) {
       setErrorGeneral(
@@ -109,7 +127,13 @@ export function SolicitudForm() {
 
   return (
     <form className="card" onSubmit={handleSubmit}>
-      <h1>Actualizar carga familiar</h1>
+      <h1>{editando ? 'Corregir carga familiar' : 'Actualizar carga familiar'}</h1>
+      {editando && (
+        <p>
+          Corrige lo que el admin observó y vuelve a adjuntar los 3
+          documentos (aunque no hayan cambiado).
+        </p>
+      )}
 
       <FormField id="rutFuncionario" label="RUT funcionario">
         <Input id="rutFuncionario" value={formatearRut(usuario.rut)} disabled />
@@ -236,7 +260,11 @@ export function SolicitudForm() {
 
       <ErrorText>{errorGeneral}</ErrorText>
       <Button type="submit" disabled={enviando}>
-        {enviando ? 'Enviando…' : 'Enviar solicitud'}
+        {enviando
+          ? 'Enviando…'
+          : editando
+            ? 'Reenviar solicitud corregida'
+            : 'Enviar solicitud'}
       </Button>
     </form>
   )

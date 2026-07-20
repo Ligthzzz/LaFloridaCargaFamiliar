@@ -76,27 +76,58 @@ export class SolicitudesService {
     });
     const guardada = await this.solicitudesRepository.save(solicitud);
 
-    const carpeta = path.join(UPLOADS_DIR, 'solicitudes', guardada.id);
-    await fs.mkdir(carpeta, { recursive: true });
+    await this.guardarArchivos(guardada.id, archivosValidados);
 
-    for (const { file, tipoDocumento } of archivosValidados) {
-      const nombreArchivo = generarNombreArchivo(file.originalname);
-      const rutaCompleta = path.join(carpeta, nombreArchivo);
-      await fs.writeFile(rutaCompleta, file.buffer);
+    return this.obtenerParaUsuario(guardada.id, funcionario);
+  }
 
-      await this.archivosRepository.save(
-        this.archivosRepository.create({
-          solicitudId: guardada.id,
-          tipoDocumento,
-          nombreOriginal: file.originalname,
-          rutaArchivo: rutaCompleta,
-          mimeType: file.mimetype,
-          tamanioBytes: file.size,
-        }),
+  async editar(
+    id: string,
+    dto: CreateSolicitudDto,
+    archivos: ArchivosSolicitud,
+    funcionario: Usuario,
+  ): Promise<Solicitud> {
+    const solicitud = await this.solicitudesRepository.findOne({
+      where: { id },
+    });
+    if (!solicitud) {
+      throw new NotFoundException('Solicitud no encontrada');
+    }
+    if (solicitud.funcionarioId !== funcionario.id) {
+      throw new ForbiddenException('No tienes acceso a esta solicitud');
+    }
+    if (solicitud.estado !== EstadoSolicitud.OBSERVADO) {
+      throw new BadRequestException(
+        'Solo puedes corregir solicitudes que estén observadas',
       );
     }
 
-    return this.obtenerParaUsuario(guardada.id, funcionario);
+    await this.validarDatosDeNegocio(dto, funcionario, id);
+    const archivosValidados = await this.validarArchivos(archivos);
+
+    solicitud.tipoCarga = dto.tipoCarga;
+    solicitud.accion = dto.accion;
+    solicitud.nombreCarga = dto.nombreCarga;
+    solicitud.rutCarga = dto.rutCarga ? normalizarRut(dto.rutCarga) : null;
+    solicitud.fechaNacimientoCarga = dto.fechaNacimientoCarga;
+    solicitud.parentesco = dto.parentesco ?? null;
+    solicitud.observacionesFuncionario = dto.observacionesFuncionario ?? null;
+    solicitud.estado = EstadoSolicitud.PENDIENTE;
+    await this.solicitudesRepository.save(solicitud);
+
+    const archivosAnteriores = await this.archivosRepository.find({
+      where: { solicitudId: id },
+    });
+    await Promise.all(
+      archivosAnteriores.map((archivo) =>
+        fs.unlink(archivo.rutaArchivo).catch(() => undefined),
+      ),
+    );
+    await this.archivosRepository.remove(archivosAnteriores);
+
+    await this.guardarArchivos(id, archivosValidados);
+
+    return this.obtenerParaUsuario(id, funcionario);
   }
 
   async listar(usuario: Usuario, estado?: EstadoSolicitud): Promise<Solicitud[]> {
@@ -223,6 +254,7 @@ export class SolicitudesService {
   private async validarDatosDeNegocio(
     dto: CreateSolicitudDto,
     funcionario: Usuario,
+    excluirSolicitudId?: string,
   ) {
     if (dto.rutCarga && normalizarRut(dto.rutCarga) === normalizarRut(funcionario.rut)) {
       throw new BadRequestException(
@@ -244,7 +276,7 @@ export class SolicitudesService {
         estado: In([EstadoSolicitud.PENDIENTE, EstadoSolicitud.OBSERVADO]),
       },
     });
-    if (duplicada) {
+    if (duplicada && duplicada.id !== excluirSolicitudId) {
       throw new BadRequestException(
         'Ya existe una solicitud pendiente u observada para esta misma carga familiar',
       );
@@ -293,5 +325,33 @@ export class SolicitudesService {
     }
 
     return resultado;
+  }
+
+  private async guardarArchivos(
+    solicitudId: string,
+    archivosValidados: Array<{
+      file: Express.Multer.File;
+      tipoDocumento: TipoDocumento;
+    }>,
+  ) {
+    const carpeta = path.join(UPLOADS_DIR, 'solicitudes', solicitudId);
+    await fs.mkdir(carpeta, { recursive: true });
+
+    for (const { file, tipoDocumento } of archivosValidados) {
+      const nombreArchivo = generarNombreArchivo(file.originalname);
+      const rutaCompleta = path.join(carpeta, nombreArchivo);
+      await fs.writeFile(rutaCompleta, file.buffer);
+
+      await this.archivosRepository.save(
+        this.archivosRepository.create({
+          solicitudId,
+          tipoDocumento,
+          nombreOriginal: file.originalname,
+          rutaArchivo: rutaCompleta,
+          mimeType: file.mimetype,
+          tamanioBytes: file.size,
+        }),
+      );
+    }
   }
 }

@@ -57,6 +57,18 @@ export class SolicitudesController {
     return this.solicitudesService.crear(dto, archivos, usuario);
   }
 
+  @Patch(':id')
+  @Roles(RolUsuario.FUNCIONARIO)
+  @UseInterceptors(ARCHIVOS_INTERCEPTOR)
+  editar(
+    @Param('id') id: string,
+    @Body() dto: CreateSolicitudDto,
+    @UploadedFiles() archivos: ArchivosSolicitud,
+    @CurrentUser() usuario: Usuario,
+  ) {
+    return this.solicitudesService.editar(id, dto, archivos, usuario);
+  }
+
   @Get()
   listar(
     @CurrentUser() usuario: Usuario,

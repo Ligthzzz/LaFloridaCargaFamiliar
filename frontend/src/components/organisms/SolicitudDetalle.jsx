@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Badge } from '../atoms/Badge'
 import { Button } from '../atoms/Button'
 import { ErrorText } from '../atoms/ErrorText'
@@ -38,10 +39,21 @@ export function SolicitudDetalle({ solicitud, esAdmin = false, onAccion }) {
     <div className="card">
       <div className="page-header">
         <h1>{solicitud.nombreCarga}</h1>
-        <Badge tone={ESTADO_TONE[solicitud.estado]}>
-          {ESTADO_LABEL[solicitud.estado]}
-        </Badge>
+        <div className="detalle-badges">
+          <Badge tone={ESTADO_TONE[solicitud.estado]}>
+            {ESTADO_LABEL[solicitud.estado]}
+          </Badge>
+          {solicitud.estado === 'PENDIENTE' && solicitud.revisadoPorId && (
+            <Badge tone="info">Corregida tras observación</Badge>
+          )}
+        </div>
       </div>
+
+      {!esAdmin && solicitud.estado === 'OBSERVADO' && (
+        <Link to={`/solicitudes/${solicitud.id}/editar`}>
+          <Button>Corregir y reenviar</Button>
+        </Link>
+      )}
 
       <dl className="detalle-grid">
         <dt>RUT funcionario</dt>

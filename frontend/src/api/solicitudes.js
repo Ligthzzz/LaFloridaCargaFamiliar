@@ -1,6 +1,6 @@
 import { client } from './client'
 
-export async function crearSolicitud(datos, archivos) {
+function construirFormData(datos, archivos) {
   const formData = new FormData()
   Object.entries(datos).forEach(([clave, valor]) => {
     if (valor !== undefined && valor !== null && valor !== '') {
@@ -10,10 +10,24 @@ export async function crearSolicitud(datos, archivos) {
   formData.append('archivoNacimiento', archivos.archivoNacimiento)
   formData.append('archivoMatrimonio', archivos.archivoMatrimonio)
   formData.append('archivoEstudios', archivos.archivoEstudios)
+  return formData
+}
 
-  const { data } = await client.post('/solicitudes', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
+export async function crearSolicitud(datos, archivos) {
+  const { data } = await client.post(
+    '/solicitudes',
+    construirFormData(datos, archivos),
+    { headers: { 'Content-Type': 'multipart/form-data' } },
+  )
+  return data
+}
+
+export async function editarSolicitud(id, datos, archivos) {
+  const { data } = await client.patch(
+    `/solicitudes/${id}`,
+    construirFormData(datos, archivos),
+    { headers: { 'Content-Type': 'multipart/form-data' } },
+  )
   return data
 }
 

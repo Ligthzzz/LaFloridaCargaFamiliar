@@ -6,6 +6,7 @@ import { LoginPage } from './pages/LoginPage'
 import { FuncionarioHomePage } from './pages/FuncionarioHomePage'
 import { SolicitudFormPage } from './pages/SolicitudFormPage'
 import { SolicitudDetailPage } from './pages/SolicitudDetailPage'
+import { SolicitudEditarPage } from './pages/SolicitudEditarPage'
 import { AdminDashboardPage } from './pages/AdminDashboardPage'
 import { AdminSolicitudDetailPage } from './pages/AdminSolicitudDetailPage'
 import { AdminUsuariosPage } from './pages/AdminUsuariosPage'
@@ -28,6 +29,10 @@ function App() {
         <Route path="/" element={<InicioSegunRol />} />
         <Route path="/solicitudes/nueva" element={<SolicitudFormPage />} />
         <Route path="/solicitudes/:id" element={<SolicitudDetailPage />} />
+        <Route
+          path="/solicitudes/:id/editar"
+          element={<SolicitudEditarPage />}
+        />
 
         <Route element={<RoleRoute rol="admin" />}>
           <Route path="/admin" element={<AdminDashboardPage />} />

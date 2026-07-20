@@ -33,9 +33,14 @@ export function SolicitudesTable({
             <td>{solicitud.nombreCarga}</td>
             <td>{new Date(solicitud.createdAt).toLocaleDateString('es-CL')}</td>
             <td>
-              <Badge tone={ESTADO_TONE[solicitud.estado]}>
-                {ESTADO_LABEL[solicitud.estado]}
-              </Badge>
+              <div className="detalle-badges">
+                <Badge tone={ESTADO_TONE[solicitud.estado]}>
+                  {ESTADO_LABEL[solicitud.estado]}
+                </Badge>
+                {solicitud.estado === 'PENDIENTE' && solicitud.revisadoPorId && (
+                  <Badge tone="info">Corregida</Badge>
+                )}
+              </div>
             </td>
             <td>
               <Link to={`${detalleBasePath}/${solicitud.id}`}>Ver</Link>
