@@ -1,11 +1,17 @@
 :root {
-  --text: #3f3f46;
-  --text-h: #18181b;
-  --bg: #f4f4f5;
+  --text: #27272a;
+  --text-h: #101010;
+  --bg: #ffffff;
   --bg-card: #ffffff;
   --border: #e4e4e7;
-  --accent: #6d28d9;
+  --accent: #0b4a00;
+  --accent-hover: #0f5f00;
   --accent-contrast: #ffffff;
+  --brand-bright: #8ed500;
+  --brand-dark: #083700;
+  --brand-blue: #002891;
+  --shadow: 0 1px 2px rgba(16, 16, 16, 0.04), 0 8px 24px rgba(16, 16, 16, 0.06);
+  --shadow-hover: 0 2px 4px rgba(16, 16, 16, 0.06), 0 12px 32px rgba(16, 16, 16, 0.1);
   --success: #15803d;
   --success-bg: #dcfce7;
   --danger: #b91c1c;
@@ -18,31 +24,9 @@
   --neutral-bg: #e4e4e7;
 
   font: 16px/1.5 system-ui, 'Segoe UI', Roboto, sans-serif;
-  color-scheme: light dark;
+  color-scheme: light;
   color: var(--text);
   background: var(--bg);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #d4d4d8;
-    --text-h: #fafafa;
-    --bg: #18181b;
-    --bg-card: #232326;
-    --border: #3f3f46;
-    --accent: #a78bfa;
-    --accent-contrast: #18181b;
-    --success: #4ade80;
-    --success-bg: #14532d;
-    --danger: #f87171;
-    --danger-bg: #7f1d1d;
-    --warning: #fbbf24;
-    --warning-bg: #78350f;
-    --info: #60a5fa;
-    --info-bg: #1e3a8a;
-    --neutral: #a1a1aa;
-    --neutral-bg: #3f3f46;
-  }
 }
 
 * {
@@ -86,15 +70,34 @@ h2 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 24px;
-  border-bottom: 1px solid var(--border);
+  padding: 10px 24px;
   background: var(--bg-card);
+  box-shadow: var(--shadow);
+  position: relative;
+}
+
+.navbar::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--brand-bright), var(--brand-blue));
 }
 
 .navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   color: var(--text-h);
   font-weight: 600;
   text-decoration: none;
+}
+
+.navbar-logo {
+  height: 36px;
+  width: auto;
 }
 
 .navbar-user {
@@ -106,9 +109,17 @@ h2 {
 .auth-layout {
   min-height: 100svh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 24px;
   padding: 16px;
+}
+
+.auth-layout-logo {
+  width: 100%;
+  max-width: 320px;
+  height: auto;
 }
 
 .auth-layout-content {
@@ -119,8 +130,9 @@ h2 {
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 24px;
+  box-shadow: var(--shadow);
 }
 
 .page-header {
@@ -153,6 +165,15 @@ h2 {
   border-radius: 6px;
   background: var(--bg);
   color: var(--text);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
 }
 
 .textarea {
@@ -183,6 +204,16 @@ h2 {
   border-radius: 6px;
   border: 1px solid transparent;
   cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .btn:disabled {
@@ -195,10 +226,18 @@ h2 {
   color: var(--accent-contrast);
 }
 
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
 .btn-secondary {
   background: transparent;
   color: var(--text-h);
   border-color: var(--border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg);
 }
 
 .btn-success {
@@ -257,6 +296,15 @@ h2 {
   font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+.table tbody tr {
+  transition: background-color 0.12s ease;
+}
+
+.table tbody tr:hover {
+  background: var(--bg-card);
+  background: color-mix(in srgb, var(--brand-bright) 6%, transparent);
 }
 
 .spinner-wrap {

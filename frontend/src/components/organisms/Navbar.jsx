@@ -8,7 +8,7 @@ export function Navbar() {
   return (
     <header className="navbar">
       <Link to={usuario?.rol === 'admin' ? '/admin' : '/'} className="navbar-brand">
-        Municipalidad de La Florida
+        <img src="/logo-mdlf.png" alt="Municipalidad de La Florida" className="navbar-logo" />
       </Link>
       <div className="navbar-user">
         {usuario?.rol === 'admin' && (
