@@ -24,7 +24,7 @@ export function LoginForm() {
       navigate(usuario.rol === 'admin' ? '/admin' : '/', { replace: true })
     } catch (err) {
       const status = err.response?.status
-      const restantes = err.response?.headers?.['x-ratelimit-remaining']
+      const restantes = err.response?.data?.intentosRestantes
 
       if (status === 429) {
         setError(
