@@ -7,6 +7,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
 
+  app.set('trust proxy', 1);
   app.use(helmet());
   app.enableCors({
     origin: process.env.FRONTEND_ORIGIN,
