@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { crearSolicitud } from '../../api/solicitudes'
-import { formatearRut, validarRut } from '../../utils/rut'
+import { formatearRut, formatearRutMientrasEscribe, validarRut } from '../../utils/rut'
+import { extraerMensajesError } from '../../utils/apiError'
 import { FormField } from '../molecules/FormField'
 import { FileDropSlot } from '../molecules/FileDropSlot'
 import { Input } from '../atoms/Input'
@@ -18,9 +19,9 @@ const TIPOS_CARGA = [
 ]
 
 const ACCIONES = [
-  { value: 'ALTA', label: 'Alta (agregar nueva carga)' },
-  { value: 'MODIFICACION', label: 'Modificación de datos' },
-  { value: 'BAJA', label: 'Baja (eliminar carga)' },
+  { value: 'ALTA', label: 'Agregar carga' },
+  { value: 'MODIFICACION', label: 'Actualizar carga' },
+  { value: 'BAJA', label: 'Eliminar carga' },
 ]
 
 const ARCHIVOS_INICIALES = {
@@ -45,7 +46,7 @@ export function SolicitudForm() {
   const [archivos, setArchivos] = useState(ARCHIVOS_INICIALES)
   const [errores, setErrores] = useState({})
   const [enviando, setEnviando] = useState(false)
-  const [errorGeneral, setErrorGeneral] = useState('')
+  const [errorGeneral, setErrorGeneral] = useState([])
 
   function actualizarCampo(campo, valor) {
     setForm((anterior) => ({ ...anterior, [campo]: valor }))
@@ -54,6 +55,17 @@ export function SolicitudForm() {
   function actualizarArchivo(campo, archivo, error) {
     setArchivos((anterior) => ({ ...anterior, [campo]: archivo }))
     setErrores((anterior) => ({ ...anterior, [campo]: error }))
+  }
+
+  function handleCambioRutCarga(e) {
+    actualizarCampo('rutCarga', formatearRutMientrasEscribe(e.target.value))
+    setErrores((anterior) => ({ ...anterior, rutCarga: '' }))
+  }
+
+  function handleBlurRutCarga() {
+    if (form.rutCarga && !validarRut(form.rutCarga)) {
+      setErrores((anterior) => ({ ...anterior, rutCarga: 'El RUT ingresado no es válido' }))
+    }
   }
 
   function validar() {
@@ -76,7 +88,7 @@ export function SolicitudForm() {
 
   async function handleSubmit(event) {
     event.preventDefault()
-    setErrorGeneral('')
+    setErrorGeneral([])
     if (!validar()) return
 
     setEnviando(true)
@@ -85,8 +97,10 @@ export function SolicitudForm() {
       navigate(`/solicitudes/${solicitud.id}`)
     } catch (error) {
       setErrorGeneral(
-        error.response?.data?.message ??
+        extraerMensajesError(
+          error,
           'No se pudo enviar la solicitud, revisa los datos e intenta de nuevo',
+        ),
       )
     } finally {
       setEnviando(false)
@@ -105,7 +119,14 @@ export function SolicitudForm() {
         <Select
           id="tipoCarga"
           value={form.tipoCarga}
-          onChange={(e) => actualizarCampo('tipoCarga', e.target.value)}
+          onChange={(e) => {
+            const valor = e.target.value
+            setForm((anterior) => ({
+              ...anterior,
+              tipoCarga: valor,
+              parentesco: valor === 'OTRO' ? anterior.parentesco : '',
+            }))
+          }}
         >
           {TIPOS_CARGA.map((opcion) => (
             <option key={opcion.value} value={opcion.value}>
@@ -115,7 +136,18 @@ export function SolicitudForm() {
         </Select>
       </FormField>
 
-      <FormField id="accion" label="Acción">
+      {form.tipoCarga === 'OTRO' && (
+        <FormField id="parentesco" label="Parentesco">
+          <Input
+            id="parentesco"
+            placeholder="Ej: hermano/a, nieto/a"
+            value={form.parentesco}
+            onChange={(e) => actualizarCampo('parentesco', e.target.value)}
+          />
+        </FormField>
+      )}
+
+      <FormField id="accion" label="Tipo de acción">
         <Select
           id="accion"
           value={form.accion}
@@ -141,8 +173,10 @@ export function SolicitudForm() {
       <FormField id="rutCarga" label="RUT de la carga (opcional)" error={errores.rutCarga}>
         <Input
           id="rutCarga"
+          placeholder="12.345.678-9"
           value={form.rutCarga}
-          onChange={(e) => actualizarCampo('rutCarga', e.target.value)}
+          onChange={handleCambioRutCarga}
+          onBlur={handleBlurRutCarga}
         />
       </FormField>
 
@@ -156,14 +190,6 @@ export function SolicitudForm() {
           onChange={(e) =>
             actualizarCampo('fechaNacimientoCarga', e.target.value)
           }
-        />
-      </FormField>
-
-      <FormField id="parentesco" label="Parentesco (si es Otro)">
-        <Input
-          id="parentesco"
-          value={form.parentesco}
-          onChange={(e) => actualizarCampo('parentesco', e.target.value)}
         />
       </FormField>
 

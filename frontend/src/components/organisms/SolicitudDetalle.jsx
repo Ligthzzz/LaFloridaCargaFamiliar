@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { Badge } from '../atoms/Badge'
 import { Button } from '../atoms/Button'
+import { ErrorText } from '../atoms/ErrorText'
 import { ComentariosThread } from './ComentariosThread'
 import { descargarArchivo } from '../../api/solicitudes'
 import { ESTADO_LABEL, ESTADO_TONE } from '../../utils/estado'
+import { extraerMensajesError } from '../../utils/apiError'
 
 const TIPO_DOCUMENTO_LABEL = {
   CERTIFICADO_NACIMIENTO: 'Certificado de nacimiento',
@@ -15,12 +17,18 @@ const TIPO_DOCUMENTO_LABEL = {
 export function SolicitudDetalle({ solicitud, esAdmin = false, onAccion }) {
   const [comentario, setComentario] = useState('')
   const [enviando, setEnviando] = useState(false)
+  const [errorAccion, setErrorAccion] = useState([])
 
   async function ejecutarAccion(accion) {
     setEnviando(true)
+    setErrorAccion([])
     try {
       await onAccion(accion, comentario)
       setComentario('')
+    } catch (error) {
+      setErrorAccion(
+        extraerMensajesError(error, 'No se pudo completar la acción'),
+      )
     } finally {
       setEnviando(false)
     }
@@ -86,6 +94,7 @@ export function SolicitudDetalle({ solicitud, esAdmin = false, onAccion }) {
             value={comentario}
             onChange={(e) => setComentario(e.target.value)}
           />
+          <ErrorText>{errorAccion}</ErrorText>
           <div className="acciones-admin-botones">
             <Button
               variant="success"

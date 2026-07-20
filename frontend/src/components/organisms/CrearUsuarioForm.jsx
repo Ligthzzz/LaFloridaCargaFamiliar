@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { crearUsuario } from '../../api/usuarios'
-import { validarRut } from '../../utils/rut'
+import { formatearRutMientrasEscribe, validarEmail, validarRut } from '../../utils/rut'
+import { extraerMensajesError } from '../../utils/apiError'
 import { FormField } from '../molecules/FormField'
 import { Input } from '../atoms/Input'
 import { Select } from '../atoms/Select'
@@ -11,7 +12,8 @@ const INICIAL = { rut: '', nombre: '', email: '', password: '', rol: 'funcionari
 
 export function CrearUsuarioForm() {
   const [form, setForm] = useState(INICIAL)
-  const [error, setError] = useState('')
+  const [errores, setErrores] = useState({})
+  const [errorGeneral, setErrorGeneral] = useState([])
   const [exito, setExito] = useState('')
   const [enviando, setEnviando] = useState(false)
 
@@ -19,25 +21,58 @@ export function CrearUsuarioForm() {
     setForm((anterior) => ({ ...anterior, [campo]: valor }))
   }
 
+  function handleCambioRut(e) {
+    actualizar('rut', formatearRutMientrasEscribe(e.target.value))
+    setErrores((anterior) => ({ ...anterior, rut: '' }))
+  }
+
+  function handleBlurRut() {
+    if (form.rut && !validarRut(form.rut)) {
+      setErrores((anterior) => ({ ...anterior, rut: 'El RUT ingresado no es válido' }))
+    }
+  }
+
+  function handleCambioEmail(e) {
+    actualizar('email', e.target.value)
+    setErrores((anterior) => ({ ...anterior, email: '' }))
+  }
+
+  function handleBlurEmail() {
+    if (form.email && !validarEmail(form.email)) {
+      setErrores((anterior) => ({
+        ...anterior,
+        email: 'Ingresa un email válido (ejemplo: nombre@dominio.cl)',
+      }))
+    }
+  }
+
+  function validar() {
+    const nuevosErrores = {}
+    if (!validarRut(form.rut)) {
+      nuevosErrores.rut = 'El RUT ingresado no es válido'
+    }
+    if (!validarEmail(form.email)) {
+      nuevosErrores.email = 'Ingresa un email válido (ejemplo: nombre@dominio.cl)'
+    }
+    setErrores((anterior) => ({ ...anterior, ...nuevosErrores }))
+    return Object.keys(nuevosErrores).length === 0
+  }
+
   async function handleSubmit(event) {
     event.preventDefault()
-    setError('')
+    setErrorGeneral([])
     setExito('')
 
-    if (!validarRut(form.rut)) {
-      setError('El RUT ingresado no es válido')
-      return
-    }
+    if (!validar()) return
 
     setEnviando(true)
     try {
       await crearUsuario(form)
       setExito(`Usuario ${form.email} creado correctamente`)
       setForm(INICIAL)
+      setErrores({})
     } catch (err) {
-      setError(
-        err.response?.data?.message ?? 'No se pudo crear el usuario',
-      )
+      setErrorGeneral(extraerMensajesError(err, 'No se pudo crear el usuario'))
     } finally {
       setEnviando(false)
     }
@@ -47,12 +82,14 @@ export function CrearUsuarioForm() {
     <form className="card" onSubmit={handleSubmit}>
       <h1>Crear usuario</h1>
 
-      <FormField id="rut" label="RUT">
+      <FormField id="rut" label="RUT" error={errores.rut}>
         <Input
           id="rut"
           required
+          placeholder="12.345.678-9"
           value={form.rut}
-          onChange={(e) => actualizar('rut', e.target.value)}
+          onChange={handleCambioRut}
+          onBlur={handleBlurRut}
         />
       </FormField>
 
@@ -65,13 +102,14 @@ export function CrearUsuarioForm() {
         />
       </FormField>
 
-      <FormField id="email" label="Email">
+      <FormField id="email" label="Email" error={errores.email}>
         <Input
           id="email"
           type="email"
           required
           value={form.email}
-          onChange={(e) => actualizar('email', e.target.value)}
+          onChange={handleCambioEmail}
+          onBlur={handleBlurEmail}
         />
       </FormField>
 
@@ -96,7 +134,7 @@ export function CrearUsuarioForm() {
         </Select>
       </FormField>
 
-      {error && <ErrorText>{error}</ErrorText>}
+      <ErrorText>{errorGeneral}</ErrorText>
       {exito && <p>{exito}</p>}
       <Button type="submit" disabled={enviando}>
         {enviando ? 'Creando…' : 'Crear usuario'}

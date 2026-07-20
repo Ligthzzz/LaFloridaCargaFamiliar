@@ -32,3 +32,13 @@ export function formatearRut(rut) {
   const cuerpoFormateado = cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
   return `${cuerpoFormateado}-${dv}`
 }
+
+// Formatea el RUT a medida que el usuario escribe (máx. 9 caracteres: 8 del cuerpo + dígito verificador)
+export function formatearRutMientrasEscribe(valor) {
+  const limpio = normalizarRut(valor).slice(0, 9)
+  return formatearRut(limpio)
+}
+
+export function validarEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}

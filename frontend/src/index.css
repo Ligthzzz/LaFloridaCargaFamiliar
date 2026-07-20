@@ -169,6 +169,13 @@ h2 {
   margin: 0;
 }
 
+.error-list {
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .btn {
   font: inherit;
   font-weight: 500;
