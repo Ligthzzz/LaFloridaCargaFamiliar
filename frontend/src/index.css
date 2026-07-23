@@ -416,3 +416,51 @@ h2 {
   gap: 8px;
   flex-wrap: wrap;
 }
+
+.carga-bloque {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  margin: 0 0 20px;
+  background: color-mix(in srgb, var(--brand-bright) 3%, var(--bg));
+}
+
+.carga-bloque-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.carga-bloque-header h2 {
+  margin: 0;
+  flex: 1;
+}
+
+.documentos-intro {
+  font-size: 14px;
+  color: var(--text);
+  margin: 4px 0 16px;
+}
+
+.aviso-exito {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--success-bg);
+  color: var(--success);
+  border-radius: 8px;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+}
+
+.aviso-exito p {
+  margin: 0;
+}
+
+.aviso-exito .link-button {
+  color: var(--success);
+  white-space: nowrap;
+}

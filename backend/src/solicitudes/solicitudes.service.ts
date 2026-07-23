@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { fileTypeFromBuffer } from 'file-type';
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -42,7 +42,6 @@ export class SolicitudesService {
     archivos: ArchivosSolicitud,
     funcionario: Usuario,
   ): Promise<Solicitud> {
-    await this.validarDatosDeNegocio(dto, funcionario);
     const archivosValidados = await this.validarArchivos(
       dto.tipoCarga,
       archivos,
@@ -83,7 +82,6 @@ export class SolicitudesService {
       );
     }
 
-    await this.validarDatosDeNegocio(dto, funcionario, id);
     const archivosValidados = await this.validarArchivos(
       dto.tipoCarga,
       archivos,
@@ -227,25 +225,6 @@ export class SolicitudesService {
     const esAdmin = usuario.rol === RolUsuario.ADMIN;
     if (!esDueno && !esAdmin) {
       throw new ForbiddenException('No tienes acceso a esta solicitud');
-    }
-  }
-
-  private async validarDatosDeNegocio(
-    dto: CreateSolicitudDto,
-    funcionario: Usuario,
-    excluirSolicitudId?: string,
-  ) {
-    const duplicada = await this.solicitudesRepository.findOne({
-      where: {
-        funcionarioId: funcionario.id,
-        tipoCarga: dto.tipoCarga as TipoCarga,
-        estado: In([EstadoSolicitud.PENDIENTE, EstadoSolicitud.OBSERVADO]),
-      },
-    });
-    if (duplicada && duplicada.id !== excluirSolicitudId) {
-      throw new BadRequestException(
-        'Ya tienes una solicitud pendiente u observada para este mismo tipo de carga',
-      );
     }
   }
 

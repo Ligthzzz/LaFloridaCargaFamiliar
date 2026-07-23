@@ -4,7 +4,7 @@ import { ErrorText } from '../atoms/ErrorText'
 const TIPOS_PERMITIDOS = ['application/pdf', 'image/jpeg', 'image/png']
 const TAMANIO_MAXIMO = 5 * 1024 * 1024
 
-export function FileDropSlot({ id, label, file, onChange, error, plantillaUrl }) {
+export function FileDropSlot({ id, label, file, onChange, error, plantillaUrl, disabled = false }) {
   function handleChange(event) {
     const nuevoArchivo = event.target.files[0] ?? null
     if (!nuevoArchivo) {
@@ -35,6 +35,7 @@ export function FileDropSlot({ id, label, file, onChange, error, plantillaUrl })
         type="file"
         accept={TIPOS_PERMITIDOS.join(',')}
         onChange={handleChange}
+        disabled={disabled}
       />
       {file && <p className="file-name">{file.name}</p>}
       <p className="file-size-aviso">
