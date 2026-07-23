@@ -24,12 +24,6 @@ export enum TipoCarga {
   OTRO = 'OTRO',
 }
 
-export enum AccionSolicitud {
-  ALTA = 'ALTA',
-  MODIFICACION = 'MODIFICACION',
-  BAJA = 'BAJA',
-}
-
 export enum EstadoSolicitud {
   PENDIENTE = 'PENDIENTE',
   APROBADO = 'APROBADO',
@@ -54,9 +48,6 @@ export class Solicitud {
 
   @Column({ type: 'enum', enum: TipoCarga, name: 'tipo_carga' })
   tipoCarga: TipoCarga;
-
-  @Column({ type: 'enum', enum: AccionSolicitud })
-  accion: AccionSolicitud;
 
   @Column({
     type: 'enum',

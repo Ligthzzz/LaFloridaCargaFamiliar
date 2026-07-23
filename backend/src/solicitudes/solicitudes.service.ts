@@ -9,12 +9,7 @@ import { In, Repository } from 'typeorm';
 import { fileTypeFromBuffer } from 'file-type';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import {
-  AccionSolicitud,
-  EstadoSolicitud,
-  Solicitud,
-  TipoCarga,
-} from './entities/solicitud.entity';
+import { EstadoSolicitud, Solicitud, TipoCarga } from './entities/solicitud.entity';
 import { ArchivoAdjunto, TipoDocumento } from './entities/archivo-adjunto.entity';
 import { Comentario } from './entities/comentario.entity';
 import { CreateSolicitudDto } from './dto/create-solicitud.dto';
@@ -57,7 +52,6 @@ export class SolicitudesService {
       funcionarioId: funcionario.id,
       rutFuncionario: normalizarRut(funcionario.rut),
       tipoCarga: dto.tipoCarga,
-      accion: dto.accion,
       observacionesFuncionario: dto.observacionesFuncionario ?? null,
       estado: EstadoSolicitud.PENDIENTE,
     });
@@ -96,7 +90,6 @@ export class SolicitudesService {
     );
 
     solicitud.tipoCarga = dto.tipoCarga;
-    solicitud.accion = dto.accion;
     solicitud.observacionesFuncionario = dto.observacionesFuncionario ?? null;
     solicitud.estado = EstadoSolicitud.PENDIENTE;
     await this.solicitudesRepository.save(solicitud);
@@ -252,15 +245,6 @@ export class SolicitudesService {
     if (duplicada && duplicada.id !== excluirSolicitudId) {
       throw new BadRequestException(
         'Ya tienes una solicitud pendiente u observada para este mismo tipo de carga',
-      );
-    }
-
-    if (
-      dto.accion === AccionSolicitud.BAJA &&
-      !dto.observacionesFuncionario
-    ) {
-      throw new BadRequestException(
-        'Debes indicar el motivo en las observaciones al dar de baja una carga',
       );
     }
   }

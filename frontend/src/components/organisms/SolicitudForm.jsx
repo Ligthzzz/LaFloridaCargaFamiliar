@@ -5,7 +5,6 @@ import { crearSolicitud, editarSolicitud } from '../../api/solicitudes'
 import { formatearRut } from '../../utils/rut'
 import { extraerMensajesError } from '../../utils/apiError'
 import { TIPOS_CARGA, camposArchivoParaTipoCarga } from '../../utils/documentosRequeridos'
-import { ACCIONES } from '../../utils/accion'
 import { FormField } from '../molecules/FormField'
 import { FileDropSlot } from '../molecules/FileDropSlot'
 import { Input } from '../atoms/Input'
@@ -22,13 +21,11 @@ export function SolicitudForm({ solicitudExistente }) {
     solicitudExistente
       ? {
           tipoCarga: solicitudExistente.tipoCarga,
-          accion: solicitudExistente.accion,
           observacionesFuncionario:
             solicitudExistente.observacionesFuncionario ?? '',
         }
       : {
           tipoCarga: TIPOS_CARGA[0].value,
-          accion: 'ALTA',
           observacionesFuncionario: '',
         },
   )
@@ -112,20 +109,6 @@ export function SolicitudForm({ solicitudExistente }) {
         </Select>
       </FormField>
 
-      <FormField id="accion" label="Tipo de acción">
-        <Select
-          id="accion"
-          value={form.accion}
-          onChange={(e) => actualizarCampo('accion', e.target.value)}
-        >
-          {ACCIONES.map((opcion) => (
-            <option key={opcion.value} value={opcion.value}>
-              {opcion.label}
-            </option>
-          ))}
-        </Select>
-      </FormField>
-
       <FormField id="observacionesFuncionario" label="Observaciones">
         <textarea
           id="observacionesFuncionario"
@@ -140,12 +123,8 @@ export function SolicitudForm({ solicitudExistente }) {
 
       <h2>Documentos de respaldo</h2>
       <p>
-        Los datos de la carga familiar (nombre, RUT, fecha de nacimiento,
-        parentesco) se registran en el formulario oficial descargable, no
-        aquí. Los documentos requeridos dependen del parentesco seleccionado
-        arriba; deben descargarse, completarse, firmarse a mano por quien
-        corresponda y volver a subirse como PDF o foto (JPG/PNG), ya que la
-        municipalidad no cuenta con firma electrónica.
+        Descarga cada formulario, complétalo a mano con los datos de la
+        carga familiar, fírmalo y súbelo aquí como PDF o foto (JPG/PNG).
       </p>
 
       {documentosDelTipo.map(({ campo, label, plantillaUrl }) => (
