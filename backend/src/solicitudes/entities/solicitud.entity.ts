@@ -58,6 +58,9 @@ export class Solicitud {
   @Column({ type: 'text', name: 'observaciones_funcionario', nullable: true })
   observacionesFuncionario: string | null;
 
+  @Column({ type: 'varchar', name: 'lote_id', nullable: true })
+  loteId: string | null;
+
   @ManyToOne(() => Usuario, { nullable: true })
   @JoinColumn({ name: 'revisado_por_id' })
   revisadoPor: Usuario | null;

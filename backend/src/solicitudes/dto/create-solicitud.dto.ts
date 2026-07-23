@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsEnum, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 import { TipoCarga } from '../entities/solicitud.entity';
 
 export class CreateSolicitudDto {
@@ -9,4 +9,8 @@ export class CreateSolicitudDto {
   @IsString()
   @MaxLength(1000)
   observacionesFuncionario?: string;
+
+  @IsOptional()
+  @IsUUID()
+  loteId?: string;
 }

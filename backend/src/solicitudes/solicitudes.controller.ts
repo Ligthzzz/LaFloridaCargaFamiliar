@@ -74,6 +74,14 @@ export class SolicitudesController {
     return this.solicitudesService.listar(usuario, estado);
   }
 
+  @Get('lote/:loteId')
+  obtenerPorLote(
+    @Param('loteId') loteId: string,
+    @CurrentUser() usuario: Usuario,
+  ) {
+    return this.solicitudesService.listarPorLote(loteId, usuario);
+  }
+
   @Get(':id')
   obtener(@Param('id') id: string, @CurrentUser() usuario: Usuario) {
     return this.solicitudesService.obtenerParaUsuario(id, usuario);

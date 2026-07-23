@@ -45,6 +45,11 @@ export async function obtenerSolicitud(id) {
   return data
 }
 
+export async function obtenerSolicitudesPorLote(loteId) {
+  const { data } = await client.get(`/solicitudes/lote/${loteId}`)
+  return data
+}
+
 export async function descargarArchivo(solicitudId, archivoId, nombreSugerido) {
   const { data } = await client.get(
     `/solicitudes/${solicitudId}/archivos/${archivoId}`,

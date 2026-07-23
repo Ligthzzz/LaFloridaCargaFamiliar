@@ -7,7 +7,7 @@ import { ComentariosThread } from './ComentariosThread'
 import { descargarArchivo } from '../../api/solicitudes'
 import { ESTADO_LABEL, ESTADO_TONE } from '../../utils/estado'
 import { extraerMensajesError } from '../../utils/apiError'
-import { TIPOS_CARGA } from '../../utils/documentosRequeridos'
+import { TIPO_CARGA_LABEL } from '../../utils/documentosRequeridos'
 
 const TIPO_DOCUMENTO_LABEL = {
   SOLICITUD_ASIGNACION_FAMILIAR: 'Solicitud de Asignación Familiar',
@@ -22,11 +22,12 @@ const TIPO_DOCUMENTO_LABEL = {
   CERTIFICADO_DEFUNCION: 'Certificado de defunción',
 }
 
-const TIPO_CARGA_LABEL = Object.fromEntries(
-  TIPOS_CARGA.map((tipo) => [tipo.value, tipo.label]),
-)
-
-export function SolicitudDetalle({ solicitud, esAdmin = false, onAccion }) {
+export function SolicitudDetalle({
+  solicitud,
+  esAdmin = false,
+  onAccion,
+  mostrarEncabezado = true,
+}) {
   const [comentario, setComentario] = useState('')
   const [enviando, setEnviando] = useState(false)
   const [errorAccion, setErrorAccion] = useState([])
@@ -48,17 +49,19 @@ export function SolicitudDetalle({ solicitud, esAdmin = false, onAccion }) {
 
   return (
     <div className="card">
-      <div className="page-header">
-        <h1>{TIPO_CARGA_LABEL[solicitud.tipoCarga] ?? solicitud.tipoCarga}</h1>
-        <div className="detalle-badges">
-          <Badge tone={ESTADO_TONE[solicitud.estado]}>
-            {ESTADO_LABEL[solicitud.estado]}
-          </Badge>
-          {solicitud.estado === 'PENDIENTE' && solicitud.revisadoPorId && (
-            <Badge tone="info">Corregida tras observación</Badge>
-          )}
+      {mostrarEncabezado && (
+        <div className="page-header">
+          <h1>{TIPO_CARGA_LABEL[solicitud.tipoCarga] ?? solicitud.tipoCarga}</h1>
+          <div className="detalle-badges">
+            <Badge tone={ESTADO_TONE[solicitud.estado]}>
+              {ESTADO_LABEL[solicitud.estado]}
+            </Badge>
+            {solicitud.estado === 'PENDIENTE' && solicitud.revisadoPorId && (
+              <Badge tone="info">Corregida tras observación</Badge>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {!esAdmin && solicitud.estado === 'OBSERVADO' && (
         <Link to={`/solicitudes/${solicitud.id}/editar`}>

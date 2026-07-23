@@ -9,6 +9,10 @@ export const TIPOS_CARGA = [
   { value: 'CAUSANTE_INVALIDO', label: 'Causante inválido/a' },
 ]
 
+export const TIPO_CARGA_LABEL = Object.fromEntries(
+  TIPOS_CARGA.map((tipo) => [tipo.value, tipo.label]),
+)
+
 export const PLANTILLA_SOLICITUD_URL = '/formulario-solicitud-asignacion-familiar.pdf'
 export const PLANTILLA_DECLARACION_JURADA_URL = '/formulario-declaracion-jurada.pdf'
 

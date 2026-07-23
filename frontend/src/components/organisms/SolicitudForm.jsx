@@ -138,6 +138,7 @@ export function SolicitudForm({ solicitudExistente }) {
     }
 
     setEnviando(true)
+    const loteId = cargas.length > 1 ? crypto.randomUUID() : undefined
     const resultadosActualizados = [...resultados]
     for (let i = 0; i < cargas.length; i++) {
       if (resultadosActualizados[i]?.estado === 'ok') continue
@@ -148,6 +149,7 @@ export function SolicitudForm({ solicitudExistente }) {
           {
             tipoCarga: cargas[i].tipoCarga,
             observacionesFuncionario: cargas[i].observacionesFuncionario,
+            loteId,
           },
           cargas[i].archivos,
         )
@@ -164,7 +166,11 @@ export function SolicitudForm({ solicitudExistente }) {
 
     const todasOk = resultadosActualizados.every((r) => r?.estado === 'ok')
     if (todasOk) {
-      navigate('/', { state: { cargasCreadas: cargas.length } })
+      if (loteId) {
+        navigate(`/solicitudes/lote/${loteId}`, { state: { cargasCreadas: cargas.length } })
+      } else {
+        navigate(`/solicitudes/${resultadosActualizados[0].id}`)
+      }
     } else {
       setErrorGeneral([
         'Algunas cargas no se pudieron enviar. Revisa los errores marcados abajo y vuelve a intentar (las que ya se enviaron no se repetirán).',

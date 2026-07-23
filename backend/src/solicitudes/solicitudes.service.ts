@@ -52,6 +52,7 @@ export class SolicitudesService {
       rutFuncionario: normalizarRut(funcionario.rut),
       tipoCarga: dto.tipoCarga,
       observacionesFuncionario: dto.observacionesFuncionario ?? null,
+      loteId: dto.loteId ?? null,
       estado: EstadoSolicitud.PENDIENTE,
     });
     const guardada = await this.solicitudesRepository.save(solicitud);
@@ -119,6 +120,26 @@ export class SolicitudesService {
       where,
       order: { createdAt: 'DESC' },
     });
+  }
+
+  async listarPorLote(loteId: string, usuario: Usuario): Promise<Solicitud[]> {
+    const solicitudes = await this.solicitudesRepository.find({
+      where: { loteId },
+      relations: { archivos: true, comentarios: { autor: true } },
+      order: { createdAt: 'ASC' },
+    });
+    if (solicitudes.length === 0) {
+      throw new NotFoundException('Envío no encontrado');
+    }
+
+    const esAdmin = usuario.rol === RolUsuario.ADMIN;
+    const visibles = esAdmin
+      ? solicitudes
+      : solicitudes.filter((s) => s.funcionarioId === usuario.id);
+    if (visibles.length === 0) {
+      throw new ForbiddenException('No tienes acceso a este envío');
+    }
+    return visibles;
   }
 
   async obtenerParaUsuario(id: string, usuario: Usuario): Promise<Solicitud> {

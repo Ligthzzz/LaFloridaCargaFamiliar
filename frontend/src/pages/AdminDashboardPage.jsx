@@ -29,6 +29,7 @@ export function AdminDashboardPage() {
         <SolicitudesTable
           solicitudes={solicitudes}
           detalleBasePath="/admin/solicitudes"
+          loteBasePath="/admin/solicitudes/lote"
         />
       )}
     </AppLayout>

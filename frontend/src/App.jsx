@@ -7,8 +7,10 @@ import { FuncionarioHomePage } from './pages/FuncionarioHomePage'
 import { SolicitudFormPage } from './pages/SolicitudFormPage'
 import { SolicitudDetailPage } from './pages/SolicitudDetailPage'
 import { SolicitudEditarPage } from './pages/SolicitudEditarPage'
+import { LoteDetallePage } from './pages/LoteDetallePage'
 import { AdminDashboardPage } from './pages/AdminDashboardPage'
 import { AdminSolicitudDetailPage } from './pages/AdminSolicitudDetailPage'
+import { AdminLoteDetallePage } from './pages/AdminLoteDetallePage'
 import { AdminUsuariosPage } from './pages/AdminUsuariosPage'
 
 function InicioSegunRol() {
@@ -28,6 +30,7 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<InicioSegunRol />} />
         <Route path="/solicitudes/nueva" element={<SolicitudFormPage />} />
+        <Route path="/solicitudes/lote/:loteId" element={<LoteDetallePage />} />
         <Route path="/solicitudes/:id" element={<SolicitudDetailPage />} />
         <Route
           path="/solicitudes/:id/editar"
@@ -36,6 +39,10 @@ function App() {
 
         <Route element={<RoleRoute rol="admin" />}>
           <Route path="/admin" element={<AdminDashboardPage />} />
+          <Route
+            path="/admin/solicitudes/lote/:loteId"
+            element={<AdminLoteDetallePage />}
+          />
           <Route
             path="/admin/solicitudes/:id"
             element={<AdminSolicitudDetailPage />}
