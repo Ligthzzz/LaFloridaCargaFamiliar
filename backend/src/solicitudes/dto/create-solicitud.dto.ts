@@ -1,12 +1,4 @@
-import {
-  IsDateString,
-  IsEnum,
-  IsOptional,
-  IsString,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
-import { IsRut } from '../../common/validators/is-rut.validator';
+import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
 import { AccionSolicitud, TipoCarga } from '../entities/solicitud.entity';
 
 export class CreateSolicitudDto {
@@ -15,23 +7,6 @@ export class CreateSolicitudDto {
 
   @IsEnum(AccionSolicitud)
   accion: AccionSolicitud;
-
-  @IsString()
-  @MinLength(2)
-  @MaxLength(150)
-  nombreCarga: string;
-
-  @IsOptional()
-  @IsRut()
-  rutCarga?: string;
-
-  @IsDateString()
-  fechaNacimientoCarga: string;
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(150)
-  parentesco?: string;
 
   @IsOptional()
   @IsString()

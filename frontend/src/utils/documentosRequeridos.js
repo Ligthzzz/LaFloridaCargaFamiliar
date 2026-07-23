@@ -14,7 +14,7 @@ export const PLANTILLA_SOLICITUD_URL = '/formulario-solicitud-asignacion-familia
 export const PLANTILLA_DECLARACION_JURADA_URL = '/formulario-declaracion-jurada.pdf'
 
 const LABELS_DOCUMENTO = {
-  archivoSolicitud: 'Solicitud de Asignación Familiar (107 SCF)',
+  archivoSolicitud: 'Solicitud de Asignación Familiar',
   archivoCertMatrimonio: 'Certificado de matrimonio',
   archivoCertInvalidez: 'Certificado de invalidez (COMPIN)',
   archivoDeclaracionJurada: 'Declaración jurada simple',

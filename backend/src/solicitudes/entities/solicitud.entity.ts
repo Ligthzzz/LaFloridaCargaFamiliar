@@ -58,18 +58,6 @@ export class Solicitud {
   @Column({ type: 'enum', enum: AccionSolicitud })
   accion: AccionSolicitud;
 
-  @Column({ name: 'nombre_carga' })
-  nombreCarga: string;
-
-  @Column({ type: 'varchar', name: 'rut_carga', nullable: true })
-  rutCarga: string | null;
-
-  @Column({ type: 'date', name: 'fecha_nacimiento_carga' })
-  fechaNacimientoCarga: string;
-
-  @Column({ type: 'varchar', nullable: true })
-  parentesco: string | null;
-
   @Column({
     type: 'enum',
     enum: EstadoSolicitud,

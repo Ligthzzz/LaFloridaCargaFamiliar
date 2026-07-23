@@ -8,9 +8,10 @@ import { descargarArchivo } from '../../api/solicitudes'
 import { ESTADO_LABEL, ESTADO_TONE } from '../../utils/estado'
 import { extraerMensajesError } from '../../utils/apiError'
 import { TIPOS_CARGA } from '../../utils/documentosRequeridos'
+import { ACCION_LABEL } from '../../utils/accion'
 
 const TIPO_DOCUMENTO_LABEL = {
-  SOLICITUD_ASIGNACION_FAMILIAR: 'Solicitud de Asignación Familiar (107 SCF)',
+  SOLICITUD_ASIGNACION_FAMILIAR: 'Solicitud de Asignación Familiar',
   DECLARACION_JURADA: 'Declaración jurada simple',
   CERTIFICADO_NACIMIENTO: 'Certificado de nacimiento',
   CERTIFICADO_MATRIMONIO: 'Certificado de matrimonio',
@@ -50,7 +51,10 @@ export function SolicitudDetalle({ solicitud, esAdmin = false, onAccion }) {
   return (
     <div className="card">
       <div className="page-header">
-        <h1>{solicitud.nombreCarga}</h1>
+        <h1>
+          {TIPO_CARGA_LABEL[solicitud.tipoCarga] ?? solicitud.tipoCarga} —{' '}
+          {ACCION_LABEL[solicitud.accion] ?? solicitud.accion}
+        </h1>
         <div className="detalle-badges">
           <Badge tone={ESTADO_TONE[solicitud.estado]}>
             {ESTADO_LABEL[solicitud.estado]}
@@ -73,13 +77,7 @@ export function SolicitudDetalle({ solicitud, esAdmin = false, onAccion }) {
         <dt>Parentesco con el beneficiario</dt>
         <dd>{TIPO_CARGA_LABEL[solicitud.tipoCarga] ?? solicitud.tipoCarga}</dd>
         <dt>Acción</dt>
-        <dd>{solicitud.accion}</dd>
-        <dt>RUT carga</dt>
-        <dd>{solicitud.rutCarga ?? '—'}</dd>
-        <dt>Fecha de nacimiento</dt>
-        <dd>{solicitud.fechaNacimientoCarga}</dd>
-        <dt>Parentesco</dt>
-        <dd>{solicitud.parentesco ?? '—'}</dd>
+        <dd>{ACCION_LABEL[solicitud.accion] ?? solicitud.accion}</dd>
         <dt>Observaciones del funcionario</dt>
         <dd>{solicitud.observacionesFuncionario ?? '—'}</dd>
       </dl>

@@ -2,21 +2,16 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { crearSolicitud, editarSolicitud } from '../../api/solicitudes'
-import { formatearRut, formatearRutMientrasEscribe, validarRut } from '../../utils/rut'
+import { formatearRut } from '../../utils/rut'
 import { extraerMensajesError } from '../../utils/apiError'
 import { TIPOS_CARGA, camposArchivoParaTipoCarga } from '../../utils/documentosRequeridos'
+import { ACCIONES } from '../../utils/accion'
 import { FormField } from '../molecules/FormField'
 import { FileDropSlot } from '../molecules/FileDropSlot'
 import { Input } from '../atoms/Input'
 import { Select } from '../atoms/Select'
 import { Button } from '../atoms/Button'
 import { ErrorText } from '../atoms/ErrorText'
-
-const ACCIONES = [
-  { value: 'ALTA', label: 'Agregar carga' },
-  { value: 'MODIFICACION', label: 'Actualizar carga' },
-  { value: 'BAJA', label: 'Eliminar carga' },
-]
 
 export function SolicitudForm({ solicitudExistente }) {
   const { usuario } = useAuth()
@@ -28,22 +23,12 @@ export function SolicitudForm({ solicitudExistente }) {
       ? {
           tipoCarga: solicitudExistente.tipoCarga,
           accion: solicitudExistente.accion,
-          nombreCarga: solicitudExistente.nombreCarga,
-          rutCarga: solicitudExistente.rutCarga
-            ? formatearRut(solicitudExistente.rutCarga)
-            : '',
-          fechaNacimientoCarga: solicitudExistente.fechaNacimientoCarga,
-          parentesco: solicitudExistente.parentesco ?? '',
           observacionesFuncionario:
             solicitudExistente.observacionesFuncionario ?? '',
         }
       : {
           tipoCarga: TIPOS_CARGA[0].value,
           accion: 'ALTA',
-          nombreCarga: '',
-          rutCarga: '',
-          fechaNacimientoCarga: '',
-          parentesco: '',
           observacionesFuncionario: '',
         },
   )
@@ -64,32 +49,13 @@ export function SolicitudForm({ solicitudExistente }) {
   }
 
   function handleCambioTipoCarga(e) {
-    const valor = e.target.value
-    setForm((anterior) => ({
-      ...anterior,
-      tipoCarga: valor,
-      parentesco: valor === 'OTRO' ? anterior.parentesco : '',
-    }))
+    actualizarCampo('tipoCarga', e.target.value)
     setArchivos({})
     setErrores({})
   }
 
-  function handleCambioRutCarga(e) {
-    actualizarCampo('rutCarga', formatearRutMientrasEscribe(e.target.value))
-    setErrores((anterior) => ({ ...anterior, rutCarga: '' }))
-  }
-
-  function handleBlurRutCarga() {
-    if (form.rutCarga && !validarRut(form.rutCarga)) {
-      setErrores((anterior) => ({ ...anterior, rutCarga: 'El RUT ingresado no es válido' }))
-    }
-  }
-
   function validar() {
     const nuevosErrores = {}
-    if (form.rutCarga && !validarRut(form.rutCarga)) {
-      nuevosErrores.rutCarga = 'El RUT ingresado no es válido'
-    }
     documentosDelTipo.forEach(({ campo }) => {
       if (!archivos[campo]) {
         nuevosErrores[campo] = 'Debes adjuntar este documento'
@@ -146,17 +112,6 @@ export function SolicitudForm({ solicitudExistente }) {
         </Select>
       </FormField>
 
-      {form.tipoCarga === 'OTRO' && (
-        <FormField id="parentesco" label="Especifica el parentesco">
-          <Input
-            id="parentesco"
-            placeholder="Ej: hermano/a, nieto/a"
-            value={form.parentesco}
-            onChange={(e) => actualizarCampo('parentesco', e.target.value)}
-          />
-        </FormField>
-      )}
-
       <FormField id="accion" label="Tipo de acción">
         <Select
           id="accion"
@@ -169,38 +124,6 @@ export function SolicitudForm({ solicitudExistente }) {
             </option>
           ))}
         </Select>
-      </FormField>
-
-      <FormField id="nombreCarga" label="Nombre completo de la carga">
-        <Input
-          id="nombreCarga"
-          required
-          value={form.nombreCarga}
-          onChange={(e) => actualizarCampo('nombreCarga', e.target.value)}
-        />
-      </FormField>
-
-      <FormField id="rutCarga" label="RUT de la carga (opcional)" error={errores.rutCarga}>
-        <Input
-          id="rutCarga"
-          placeholder="12.345.678-9"
-          value={form.rutCarga}
-          onChange={handleCambioRutCarga}
-          onBlur={handleBlurRutCarga}
-        />
-      </FormField>
-
-      <FormField id="fechaNacimientoCarga" label="Fecha de nacimiento">
-        <Input
-          id="fechaNacimientoCarga"
-          type="date"
-          required
-          max={new Date().toISOString().slice(0, 10)}
-          value={form.fechaNacimientoCarga}
-          onChange={(e) =>
-            actualizarCampo('fechaNacimientoCarga', e.target.value)
-          }
-        />
       </FormField>
 
       <FormField id="observacionesFuncionario" label="Observaciones">
@@ -217,10 +140,12 @@ export function SolicitudForm({ solicitudExistente }) {
 
       <h2>Documentos de respaldo</h2>
       <p>
-        Los documentos requeridos dependen del parentesco seleccionado. Los
-        formularios oficiales deben descargarse, completarse, firmarse a mano
-        por quien corresponda y volver a subirse como PDF o foto (JPG/PNG),
-        ya que la municipalidad no cuenta con firma electrónica.
+        Los datos de la carga familiar (nombre, RUT, fecha de nacimiento,
+        parentesco) se registran en el formulario oficial descargable, no
+        aquí. Los documentos requeridos dependen del parentesco seleccionado
+        arriba; deben descargarse, completarse, firmarse a mano por quien
+        corresponda y volver a subirse como PDF o foto (JPG/PNG), ya que la
+        municipalidad no cuenta con firma electrónica.
       </p>
 
       {documentosDelTipo.map(({ campo, label, plantillaUrl }) => (

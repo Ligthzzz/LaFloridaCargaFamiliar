@@ -58,10 +58,6 @@ export class SolicitudesService {
       rutFuncionario: normalizarRut(funcionario.rut),
       tipoCarga: dto.tipoCarga,
       accion: dto.accion,
-      nombreCarga: dto.nombreCarga,
-      rutCarga: dto.rutCarga ? normalizarRut(dto.rutCarga) : null,
-      fechaNacimientoCarga: dto.fechaNacimientoCarga,
-      parentesco: dto.parentesco ?? null,
       observacionesFuncionario: dto.observacionesFuncionario ?? null,
       estado: EstadoSolicitud.PENDIENTE,
     });
@@ -101,10 +97,6 @@ export class SolicitudesService {
 
     solicitud.tipoCarga = dto.tipoCarga;
     solicitud.accion = dto.accion;
-    solicitud.nombreCarga = dto.nombreCarga;
-    solicitud.rutCarga = dto.rutCarga ? normalizarRut(dto.rutCarga) : null;
-    solicitud.fechaNacimientoCarga = dto.fechaNacimientoCarga;
-    solicitud.parentesco = dto.parentesco ?? null;
     solicitud.observacionesFuncionario = dto.observacionesFuncionario ?? null;
     solicitud.estado = EstadoSolicitud.PENDIENTE;
     await this.solicitudesRepository.save(solicitud);
@@ -250,29 +242,16 @@ export class SolicitudesService {
     funcionario: Usuario,
     excluirSolicitudId?: string,
   ) {
-    if (dto.rutCarga && normalizarRut(dto.rutCarga) === normalizarRut(funcionario.rut)) {
-      throw new BadRequestException(
-        'El RUT de la carga no puede ser igual al del funcionario',
-      );
-    }
-
-    if (new Date(dto.fechaNacimientoCarga).getTime() > Date.now()) {
-      throw new BadRequestException(
-        'La fecha de nacimiento no puede ser futura',
-      );
-    }
-
     const duplicada = await this.solicitudesRepository.findOne({
       where: {
         funcionarioId: funcionario.id,
         tipoCarga: dto.tipoCarga as TipoCarga,
-        nombreCarga: dto.nombreCarga,
         estado: In([EstadoSolicitud.PENDIENTE, EstadoSolicitud.OBSERVADO]),
       },
     });
     if (duplicada && duplicada.id !== excluirSolicitudId) {
       throw new BadRequestException(
-        'Ya existe una solicitud pendiente u observada para esta misma carga familiar',
+        'Ya tienes una solicitud pendiente u observada para este mismo tipo de carga',
       );
     }
 
