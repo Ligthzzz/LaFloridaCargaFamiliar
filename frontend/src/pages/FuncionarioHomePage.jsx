@@ -12,7 +12,7 @@ export function FuncionarioHomePage() {
       <div className="page-header">
         <h1>Mis cargas familiares</h1>
         <Link to="/solicitudes/nueva">
-          <Button>Actualizar carga familiar</Button>
+          <Button>Agregar nueva carga familiar</Button>
         </Link>
       </div>
 

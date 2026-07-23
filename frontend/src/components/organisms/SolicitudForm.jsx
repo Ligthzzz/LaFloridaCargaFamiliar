@@ -127,7 +127,7 @@ export function SolicitudForm({ solicitudExistente }) {
 
   return (
     <form className="card" onSubmit={handleSubmit}>
-      <h1>{editando ? 'Corregir carga familiar' : 'Actualizar carga familiar'}</h1>
+      <h1>{editando ? 'Corregir carga familiar' : 'Agregar nueva carga familiar'}</h1>
       {editando && (
         <p>
           Corrige lo que el admin observó y vuelve a adjuntar los 3

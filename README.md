@@ -56,7 +56,7 @@ Abre `http://localhost:5173`.
 1. Inicia sesión como admin (`admin@laflorida.cl` / `Admin123!`).
 2. Ve a **Usuarios** y crea una cuenta de funcionario (RUT, nombre, email, contraseña).
 3. Cierra sesión e inicia sesión con esa cuenta de funcionario.
-4. Haz clic en **Actualizar carga familiar**, completa el formulario y adjunta los 3 documentos (PDF, JPG o PNG, máx. 5MB cada uno).
+4. Haz clic en **Agregar nueva carga familiar**, completa el formulario y adjunta los documentos requeridos (PDF, JPG o PNG, máx. 5MB cada uno).
 5. Vuelve a entrar como admin, abre la solicitud, revisa los archivos y apruébala, recházala u obsérvala dejando un comentario.
 6. Entra de nuevo como el funcionario para ver el estado y el comentario del admin.
 
