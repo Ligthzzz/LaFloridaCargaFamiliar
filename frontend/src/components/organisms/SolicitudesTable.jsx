@@ -53,7 +53,7 @@ export function SolicitudesTable({
         <tr>
           {mostrarFuncionario && <th>Funcionario</th>}
           <th>RUT</th>
-          <th>Tipo de carga</th>
+          <th>Carga(s)</th>
           <th>Fecha</th>
           <th>Estado</th>
           <th></th>
