@@ -13,9 +13,14 @@ import { ArchivoAdjunto } from './archivo-adjunto.entity';
 import { Comentario } from './comentario.entity';
 
 export enum TipoCarga {
-  HIJO = 'HIJO',
   CONYUGE = 'CONYUGE',
-  PADRE_MADRE = 'PADRE_MADRE',
+  CONYUGE_INVALIDO = 'CONYUGE_INVALIDO',
+  HIJO = 'HIJO',
+  HIJO_MAYOR_18 = 'HIJO_MAYOR_18',
+  NIETO_BISNIETO = 'NIETO_BISNIETO',
+  ASCENDIENTE_MAYOR_65 = 'ASCENDIENTE_MAYOR_65',
+  MADRE_VIUDA = 'MADRE_VIUDA',
+  CAUSANTE_INVALIDO = 'CAUSANTE_INVALIDO',
   OTRO = 'OTRO',
 }
 

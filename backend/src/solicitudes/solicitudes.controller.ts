@@ -28,13 +28,10 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { RolUsuario, Usuario } from '../usuarios/entities/usuario.entity';
 import { EstadoSolicitud } from './entities/solicitud.entity';
 import { TAMANIO_MAXIMO_BYTES } from '../common/utils/archivo.util';
+import { TODOS_LOS_CAMPOS_ARCHIVO } from './documentos-requeridos.config';
 
 const ARCHIVOS_INTERCEPTOR = FileFieldsInterceptor(
-  [
-    { name: 'archivoNacimiento', maxCount: 1 },
-    { name: 'archivoMatrimonio', maxCount: 1 },
-    { name: 'archivoEstudios', maxCount: 1 },
-  ],
+  TODOS_LOS_CAMPOS_ARCHIVO.map((name) => ({ name, maxCount: 1 })),
   {
     storage: memoryStorage(),
     limits: { fileSize: TAMANIO_MAXIMO_BYTES },

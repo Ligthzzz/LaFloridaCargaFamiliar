@@ -7,9 +7,11 @@ function construirFormData(datos, archivos) {
       formData.append(clave, valor)
     }
   })
-  formData.append('archivoNacimiento', archivos.archivoNacimiento)
-  formData.append('archivoMatrimonio', archivos.archivoMatrimonio)
-  formData.append('archivoEstudios', archivos.archivoEstudios)
+  Object.entries(archivos).forEach(([campo, archivo]) => {
+    if (archivo) {
+      formData.append(campo, archivo)
+    }
+  })
   return formData
 }
 

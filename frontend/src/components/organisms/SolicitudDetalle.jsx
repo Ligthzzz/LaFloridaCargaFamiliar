@@ -7,13 +7,25 @@ import { ComentariosThread } from './ComentariosThread'
 import { descargarArchivo } from '../../api/solicitudes'
 import { ESTADO_LABEL, ESTADO_TONE } from '../../utils/estado'
 import { extraerMensajesError } from '../../utils/apiError'
+import { TIPOS_CARGA } from '../../utils/documentosRequeridos'
 
 const TIPO_DOCUMENTO_LABEL = {
+  SOLICITUD_ASIGNACION_FAMILIAR: 'Solicitud de Asignación Familiar (107 SCF)',
+  DECLARACION_JURADA: 'Declaración jurada simple',
   CERTIFICADO_NACIMIENTO: 'Certificado de nacimiento',
   CERTIFICADO_MATRIMONIO: 'Certificado de matrimonio',
+  CERTIFICADO_MATRIMONIO_PADRES: 'Certificado de matrimonio de los padres',
   CERTIFICADO_ESTUDIOS: 'Certificado de estudios',
+  CERTIFICADO_INVALIDEZ: 'Certificado de invalidez (COMPIN)',
+  CERTIFICADO_PARENTESCO: 'Certificado de parentesco',
+  CERTIFICADO_ORFANDAD_ABANDONO: 'Certificado de orfandad/abandono',
+  CERTIFICADO_DEFUNCION: 'Certificado de defunción',
   OTRO: 'Otro',
 }
+
+const TIPO_CARGA_LABEL = Object.fromEntries(
+  TIPOS_CARGA.map((tipo) => [tipo.value, tipo.label]),
+)
 
 export function SolicitudDetalle({ solicitud, esAdmin = false, onAccion }) {
   const [comentario, setComentario] = useState('')
@@ -58,8 +70,8 @@ export function SolicitudDetalle({ solicitud, esAdmin = false, onAccion }) {
       <dl className="detalle-grid">
         <dt>RUT funcionario</dt>
         <dd>{solicitud.rutFuncionario}</dd>
-        <dt>Tipo de carga</dt>
-        <dd>{solicitud.tipoCarga}</dd>
+        <dt>Parentesco con el beneficiario</dt>
+        <dd>{TIPO_CARGA_LABEL[solicitud.tipoCarga] ?? solicitud.tipoCarga}</dd>
         <dt>Acción</dt>
         <dd>{solicitud.accion}</dd>
         <dt>RUT carga</dt>

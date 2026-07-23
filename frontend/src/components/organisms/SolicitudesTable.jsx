@@ -1,6 +1,11 @@
 import { Link } from 'react-router-dom'
 import { Badge } from '../atoms/Badge'
 import { ESTADO_LABEL, ESTADO_TONE } from '../../utils/estado'
+import { TIPOS_CARGA } from '../../utils/documentosRequeridos'
+
+const TIPO_CARGA_LABEL = Object.fromEntries(
+  TIPOS_CARGA.map((tipo) => [tipo.value, tipo.label]),
+)
 
 export function SolicitudesTable({
   solicitudes,
@@ -29,7 +34,7 @@ export function SolicitudesTable({
           <tr key={solicitud.id}>
             {mostrarFuncionario && <td>{solicitud.funcionario?.nombre}</td>}
             <td>{solicitud.rutFuncionario}</td>
-            <td>{solicitud.tipoCarga}</td>
+            <td>{TIPO_CARGA_LABEL[solicitud.tipoCarga] ?? solicitud.tipoCarga}</td>
             <td>{solicitud.nombreCarga}</td>
             <td>{new Date(solicitud.createdAt).toLocaleDateString('es-CL')}</td>
             <td>

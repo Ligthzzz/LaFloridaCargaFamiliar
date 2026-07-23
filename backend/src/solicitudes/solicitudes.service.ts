@@ -25,23 +25,11 @@ import {
   TAMANIO_MAXIMO_BYTES,
   generarNombreArchivo,
 } from '../common/utils/archivo.util';
+import { DOCUMENTOS_REQUERIDOS } from './documentos-requeridos.config';
 
-export interface ArchivosSolicitud {
-  archivoNacimiento?: Express.Multer.File[];
-  archivoMatrimonio?: Express.Multer.File[];
-  archivoEstudios?: Express.Multer.File[];
-}
+export type ArchivosSolicitud = Record<string, Express.Multer.File[] | undefined>;
 
 const UPLOADS_DIR = process.env.UPLOADS_DIR ?? 'uploads';
-
-const SLOTS: Array<{
-  campo: keyof ArchivosSolicitud;
-  tipoDocumento: TipoDocumento;
-}> = [
-  { campo: 'archivoNacimiento', tipoDocumento: TipoDocumento.CERTIFICADO_NACIMIENTO },
-  { campo: 'archivoMatrimonio', tipoDocumento: TipoDocumento.CERTIFICADO_MATRIMONIO },
-  { campo: 'archivoEstudios', tipoDocumento: TipoDocumento.CERTIFICADO_ESTUDIOS },
-];
 
 @Injectable()
 export class SolicitudesService {
@@ -60,7 +48,10 @@ export class SolicitudesService {
     funcionario: Usuario,
   ): Promise<Solicitud> {
     await this.validarDatosDeNegocio(dto, funcionario);
-    const archivosValidados = await this.validarArchivos(archivos);
+    const archivosValidados = await this.validarArchivos(
+      dto.tipoCarga,
+      archivos,
+    );
 
     const solicitud = this.solicitudesRepository.create({
       funcionarioId: funcionario.id,
@@ -103,7 +94,10 @@ export class SolicitudesService {
     }
 
     await this.validarDatosDeNegocio(dto, funcionario, id);
-    const archivosValidados = await this.validarArchivos(archivos);
+    const archivosValidados = await this.validarArchivos(
+      dto.tipoCarga,
+      archivos,
+    );
 
     solicitud.tipoCarga = dto.tipoCarga;
     solicitud.accion = dto.accion;
@@ -292,17 +286,21 @@ export class SolicitudesService {
     }
   }
 
-  private async validarArchivos(archivos: ArchivosSolicitud) {
+  private async validarArchivos(
+    tipoCarga: TipoCarga,
+    archivos: ArchivosSolicitud,
+  ) {
+    const requisitos = DOCUMENTOS_REQUERIDOS[tipoCarga];
     const resultado: Array<{
       file: Express.Multer.File;
       tipoDocumento: TipoDocumento;
     }> = [];
 
-    for (const { campo, tipoDocumento } of SLOTS) {
+    for (const { campo, tipoDocumento } of requisitos) {
       const files = archivos[campo];
       if (!files || files.length !== 1) {
         throw new BadRequestException(
-          `Debes adjuntar exactamente un archivo para "${tipoDocumento}"`,
+          `Debes adjuntar el documento requerido: "${tipoDocumento}"`,
         );
       }
       const file = files[0];

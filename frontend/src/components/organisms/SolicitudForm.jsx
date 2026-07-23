@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import { crearSolicitud, editarSolicitud } from '../../api/solicitudes'
 import { formatearRut, formatearRutMientrasEscribe, validarRut } from '../../utils/rut'
 import { extraerMensajesError } from '../../utils/apiError'
+import { TIPOS_CARGA, camposArchivoParaTipoCarga } from '../../utils/documentosRequeridos'
 import { FormField } from '../molecules/FormField'
 import { FileDropSlot } from '../molecules/FileDropSlot'
 import { Input } from '../atoms/Input'
@@ -11,24 +12,11 @@ import { Select } from '../atoms/Select'
 import { Button } from '../atoms/Button'
 import { ErrorText } from '../atoms/ErrorText'
 
-const TIPOS_CARGA = [
-  { value: 'HIJO', label: 'Hijo/a' },
-  { value: 'CONYUGE', label: 'Cónyuge' },
-  { value: 'PADRE_MADRE', label: 'Padre/Madre' },
-  { value: 'OTRO', label: 'Otro' },
-]
-
 const ACCIONES = [
   { value: 'ALTA', label: 'Agregar carga' },
   { value: 'MODIFICACION', label: 'Actualizar carga' },
   { value: 'BAJA', label: 'Eliminar carga' },
 ]
-
-const ARCHIVOS_INICIALES = {
-  archivoNacimiento: null,
-  archivoMatrimonio: null,
-  archivoEstudios: null,
-}
 
 export function SolicitudForm({ solicitudExistente }) {
   const { usuario } = useAuth()
@@ -50,7 +38,7 @@ export function SolicitudForm({ solicitudExistente }) {
             solicitudExistente.observacionesFuncionario ?? '',
         }
       : {
-          tipoCarga: 'HIJO',
+          tipoCarga: TIPOS_CARGA[0].value,
           accion: 'ALTA',
           nombreCarga: '',
           rutCarga: '',
@@ -59,10 +47,12 @@ export function SolicitudForm({ solicitudExistente }) {
           observacionesFuncionario: '',
         },
   )
-  const [archivos, setArchivos] = useState(ARCHIVOS_INICIALES)
+  const [archivos, setArchivos] = useState({})
   const [errores, setErrores] = useState({})
   const [enviando, setEnviando] = useState(false)
   const [errorGeneral, setErrorGeneral] = useState([])
+
+  const documentosDelTipo = camposArchivoParaTipoCarga(form.tipoCarga)
 
   function actualizarCampo(campo, valor) {
     setForm((anterior) => ({ ...anterior, [campo]: valor }))
@@ -71,6 +61,17 @@ export function SolicitudForm({ solicitudExistente }) {
   function actualizarArchivo(campo, archivo, error) {
     setArchivos((anterior) => ({ ...anterior, [campo]: archivo }))
     setErrores((anterior) => ({ ...anterior, [campo]: error }))
+  }
+
+  function handleCambioTipoCarga(e) {
+    const valor = e.target.value
+    setForm((anterior) => ({
+      ...anterior,
+      tipoCarga: valor,
+      parentesco: valor === 'OTRO' ? anterior.parentesco : '',
+    }))
+    setArchivos({})
+    setErrores({})
   }
 
   function handleCambioRutCarga(e) {
@@ -89,15 +90,11 @@ export function SolicitudForm({ solicitudExistente }) {
     if (form.rutCarga && !validarRut(form.rutCarga)) {
       nuevosErrores.rutCarga = 'El RUT ingresado no es válido'
     }
-    if (!archivos.archivoNacimiento) {
-      nuevosErrores.archivoNacimiento = 'Debes adjuntar este documento'
-    }
-    if (!archivos.archivoMatrimonio) {
-      nuevosErrores.archivoMatrimonio = 'Debes adjuntar este documento'
-    }
-    if (!archivos.archivoEstudios) {
-      nuevosErrores.archivoEstudios = 'Debes adjuntar este documento'
-    }
+    documentosDelTipo.forEach(({ campo }) => {
+      if (!archivos[campo]) {
+        nuevosErrores[campo] = 'Debes adjuntar este documento'
+      }
+    })
     setErrores((anterior) => ({ ...anterior, ...nuevosErrores }))
     return Object.keys(nuevosErrores).length === 0
   }
@@ -130,8 +127,8 @@ export function SolicitudForm({ solicitudExistente }) {
       <h1>{editando ? 'Corregir carga familiar' : 'Agregar nueva carga familiar'}</h1>
       {editando && (
         <p>
-          Corrige lo que el admin observó y vuelve a adjuntar los 3
-          documentos (aunque no hayan cambiado).
+          Corrige lo que el admin observó y vuelve a adjuntar los documentos
+          requeridos (aunque no hayan cambiado).
         </p>
       )}
 
@@ -139,19 +136,8 @@ export function SolicitudForm({ solicitudExistente }) {
         <Input id="rutFuncionario" value={formatearRut(usuario.rut)} disabled />
       </FormField>
 
-      <FormField id="tipoCarga" label="Tipo de carga">
-        <Select
-          id="tipoCarga"
-          value={form.tipoCarga}
-          onChange={(e) => {
-            const valor = e.target.value
-            setForm((anterior) => ({
-              ...anterior,
-              tipoCarga: valor,
-              parentesco: valor === 'OTRO' ? anterior.parentesco : '',
-            }))
-          }}
-        >
+      <FormField id="tipoCarga" label="Parentesco con el beneficiario">
+        <Select id="tipoCarga" value={form.tipoCarga} onChange={handleCambioTipoCarga}>
           {TIPOS_CARGA.map((opcion) => (
             <option key={opcion.value} value={opcion.value}>
               {opcion.label}
@@ -161,7 +147,7 @@ export function SolicitudForm({ solicitudExistente }) {
       </FormField>
 
       {form.tipoCarga === 'OTRO' && (
-        <FormField id="parentesco" label="Parentesco">
+        <FormField id="parentesco" label="Especifica el parentesco">
           <Input
             id="parentesco"
             placeholder="Ej: hermano/a, nieto/a"
@@ -230,33 +216,24 @@ export function SolicitudForm({ solicitudExistente }) {
       </FormField>
 
       <h2>Documentos de respaldo</h2>
-      <FileDropSlot
-        id="archivoNacimiento"
-        label="Certificado de nacimiento"
-        file={archivos.archivoNacimiento}
-        error={errores.archivoNacimiento}
-        onChange={(archivo, error) =>
-          actualizarArchivo('archivoNacimiento', archivo, error)
-        }
-      />
-      <FileDropSlot
-        id="archivoMatrimonio"
-        label="Certificado de matrimonio"
-        file={archivos.archivoMatrimonio}
-        error={errores.archivoMatrimonio}
-        onChange={(archivo, error) =>
-          actualizarArchivo('archivoMatrimonio', archivo, error)
-        }
-      />
-      <FileDropSlot
-        id="archivoEstudios"
-        label="Certificado de estudios"
-        file={archivos.archivoEstudios}
-        error={errores.archivoEstudios}
-        onChange={(archivo, error) =>
-          actualizarArchivo('archivoEstudios', archivo, error)
-        }
-      />
+      <p>
+        Los documentos requeridos dependen del parentesco seleccionado. Los
+        formularios oficiales deben descargarse, completarse, firmarse a mano
+        por quien corresponda y volver a subirse como PDF o foto (JPG/PNG),
+        ya que la municipalidad no cuenta con firma electrónica.
+      </p>
+
+      {documentosDelTipo.map(({ campo, label, plantillaUrl }) => (
+        <FileDropSlot
+          key={campo}
+          id={campo}
+          label={label}
+          plantillaUrl={plantillaUrl}
+          file={archivos[campo]}
+          error={errores[campo]}
+          onChange={(archivo, error) => actualizarArchivo(campo, archivo, error)}
+        />
+      ))}
 
       <ErrorText>{errorGeneral}</ErrorText>
       <Button type="submit" disabled={enviando}>
