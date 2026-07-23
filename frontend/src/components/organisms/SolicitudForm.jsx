@@ -99,7 +99,7 @@ export function SolicitudForm({ solicitudExistente }) {
         <Input id="rutFuncionario" value={formatearRut(usuario.rut)} disabled />
       </FormField>
 
-      <FormField id="tipoCarga" label="Parentesco con el beneficiario">
+      <FormField id="tipoCarga" label="Parentesco con el funcionario">
         <Select id="tipoCarga" value={form.tipoCarga} onChange={handleCambioTipoCarga}>
           {TIPOS_CARGA.map((opcion) => (
             <option key={opcion.value} value={opcion.value}>

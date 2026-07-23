@@ -21,7 +21,6 @@ export enum TipoCarga {
   ASCENDIENTE_MAYOR_65 = 'ASCENDIENTE_MAYOR_65',
   MADRE_VIUDA = 'MADRE_VIUDA',
   CAUSANTE_INVALIDO = 'CAUSANTE_INVALIDO',
-  OTRO = 'OTRO',
 }
 
 export enum EstadoSolicitud {

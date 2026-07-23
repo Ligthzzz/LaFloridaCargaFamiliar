@@ -135,13 +135,6 @@ export const DOCUMENTOS_REQUERIDOS: Record<TipoCarga, RequisitoDocumento[]> = {
       tipoDocumento: TipoDocumento.CERTIFICADO_INVALIDEZ,
     },
   ],
-  [TipoCarga.OTRO]: [
-    {
-      campo: 'archivoSolicitud',
-      tipoDocumento: TipoDocumento.SOLICITUD_ASIGNACION_FAMILIAR,
-    },
-    { campo: 'archivoOtro', tipoDocumento: TipoDocumento.OTRO },
-  ],
 };
 
 export const TODOS_LOS_CAMPOS_ARCHIVO = Array.from(

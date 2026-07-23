@@ -7,7 +7,6 @@ export const TIPOS_CARGA = [
   { value: 'ASCENDIENTE_MAYOR_65', label: 'Ascendiente mayor de 65 años' },
   { value: 'MADRE_VIUDA', label: 'Madre viuda' },
   { value: 'CAUSANTE_INVALIDO', label: 'Causante inválido/a' },
-  { value: 'OTRO', label: 'Otro' },
 ]
 
 export const PLANTILLA_SOLICITUD_URL = '/formulario-solicitud-asignacion-familiar.pdf'
@@ -24,7 +23,6 @@ const LABELS_DOCUMENTO = {
   archivoCertOrfandad: 'Certificado de orfandad/abandono',
   archivoCertMatrimonioPadres: 'Certificado de matrimonio de los padres',
   archivoCertDefuncion: 'Certificado de defunción',
-  archivoOtro: 'Otro documento',
 }
 
 const PLANTILLA_POR_CAMPO = {
@@ -67,7 +65,6 @@ export const DOCUMENTOS_REQUERIDOS = {
     'archivoDeclaracionJurada',
   ],
   CAUSANTE_INVALIDO: ['archivoSolicitud', 'archivoCertInvalidez'],
-  OTRO: ['archivoSolicitud', 'archivoOtro'],
 }
 
 export function camposArchivoParaTipoCarga(tipoCarga) {

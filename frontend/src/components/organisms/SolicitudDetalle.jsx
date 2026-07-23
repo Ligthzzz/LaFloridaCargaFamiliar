@@ -20,7 +20,6 @@ const TIPO_DOCUMENTO_LABEL = {
   CERTIFICADO_PARENTESCO: 'Certificado de parentesco',
   CERTIFICADO_ORFANDAD_ABANDONO: 'Certificado de orfandad/abandono',
   CERTIFICADO_DEFUNCION: 'Certificado de defunción',
-  OTRO: 'Otro',
 }
 
 const TIPO_CARGA_LABEL = Object.fromEntries(
@@ -70,7 +69,7 @@ export function SolicitudDetalle({ solicitud, esAdmin = false, onAccion }) {
       <dl className="detalle-grid">
         <dt>RUT funcionario</dt>
         <dd>{solicitud.rutFuncionario}</dd>
-        <dt>Parentesco con el beneficiario</dt>
+        <dt>Parentesco con el funcionario</dt>
         <dd>{TIPO_CARGA_LABEL[solicitud.tipoCarga] ?? solicitud.tipoCarga}</dd>
         <dt>Observaciones del funcionario</dt>
         <dd>{solicitud.observacionesFuncionario ?? '—'}</dd>
